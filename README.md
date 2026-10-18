@@ -8,12 +8,13 @@ The historical implementation was taken from [Xyndra/keiyoushi-extensions-source
 
 ## Published repository
 
-This module declares the `en` and `all` sources together, so they are distributed in one APK. The hosted repo includes the APK and indexes for current Mihon and legacy-compatible clients:
+This module declares the `en` and `all` sources together. The hosted repo includes an APK for Android clients, a JVM JAR for Tachimanga, and indexes for current Mihon and legacy-compatible clients:
 
 - Mihon 0.20+: <https://pub-4516beba67d347eeabaa848f3f129375.r2.dev/repo.json>
 - Tachimanga: <https://raw.githubusercontent.com/MorpKnight/trust-me-bro/main/repo/index.pb>
 - Legacy-compatible clients: <https://raw.githubusercontent.com/MorpKnight/trust-me-bro/main/repo/index.min.json>
-- APK: <https://pub-4516beba67d347eeabaa848f3f129375.r2.dev/apk/tachiyomi-all.nhentai-v1.6.55.apk>
+- APK: <https://pub-4516beba67d347eeabaa848f3f129375.r2.dev/apk/tachiyomi-all.nhentai-v1.6.56.apk>
+- Tachimanga JAR: <https://pub-4516beba67d347eeabaa848f3f129375.r2.dev/jar/tachiyomi-all.nhentai-v1.6.56.jar>
 
 The v2 repository index pins the APK signing certificate fingerprint. This initial APK uses the local Android debug signing key; future releases must keep using that same key to update an existing installation. The key is stored on this computer, outside this project, so keep it available or set up a dedicated release key before moving builds to another machine.
 
