@@ -21,6 +21,7 @@ import keiyoushi.utils.asJsoup
 import keiyoushi.utils.firstInstanceOrNull
 import keiyoushi.utils.getPreferencesLazy
 import keiyoushi.utils.parseAs
+import keiyoushi.utils.toJsonString
 import kotlinx.serialization.json.JsonElement
 import okhttp3.Headers
 import okhttp3.HttpUrl
@@ -31,7 +32,9 @@ import org.jsoup.nodes.Element
 import kotlin.time.Duration.Companion.seconds
 
 @Source
-abstract class NHentai : KeiSource(), ConfigurableSource {
+abstract class NHentai :
+    KeiSource(),
+    ConfigurableSource {
 
     override val supportsLatest = true
 
@@ -116,7 +119,15 @@ abstract class NHentai : KeiSource(), ConfigurableSource {
         }
 
         val filterList = if (filters.isEmpty()) getFilterList(null) else filters
-        val advancedQuery = combineQuery(filterList)
+        val selectedPresetName = filterList.firstInstanceOrNull<LoadPresetFilter>()?.selectedPresetName
+        val selectedPreset = selectedPresetName?.let { name ->
+            getFilterPresets().firstOrNull { it.name == name }
+        }
+        val advancedQuery = listOfNotNull(
+            selectedPreset?.query?.takeIf(String::isNotBlank),
+            combineQuery(filterList).takeIf(String::isNotBlank),
+        ).distinct().joinToString(" ")
+        saveFilterPresetIfRequested(filterList, advancedQuery)
         val favoriteFilter = filterList.firstInstanceOrNull<FavoriteFilter>()
         val offsetPage = filterList.firstInstanceOrNull<OffsetPageFilter>()
             ?.state?.toIntOrNull()?.plus(page) ?: page
@@ -250,6 +261,32 @@ abstract class NHentai : KeiSource(), ConfigurableSource {
         }
     }.trim()
 
+    private fun getFilterPresets(): List<FilterPreset> = preferences.getString(FILTER_PRESETS_PREF, null)
+        ?.parseAs<List<FilterPreset>>()
+        .orEmpty()
+
+    private fun saveFilterPresetIfRequested(filters: FilterList, query: String) {
+        val saveFilter = filters.firstInstanceOrNull<SavePresetFilter>() ?: return
+        if (!saveFilter.state) return
+
+        val nameFilter = filters.firstInstanceOrNull<SavePresetNameFilter>()
+        val name = nameFilter?.state?.trim().orEmpty()
+        if (name.isNotBlank() && query.isNotBlank()) {
+            val existingPresets = getFilterPresets()
+            val hasPreset = existingPresets.any { it.name.equals(name, ignoreCase = true) }
+            val presets = if (hasPreset) {
+                existingPresets.map {
+                    if (it.name.equals(name, ignoreCase = true)) FilterPreset(name, query) else it
+                }
+            } else {
+                existingPresets + FilterPreset(name, query)
+            }
+            preferences.edit().putString(FILTER_PRESETS_PREF, presets.toJsonString()).apply()
+            nameFilter?.state = ""
+        }
+        saveFilter.state = false
+    }
+
     override fun getFilterList(data: JsonElement?) = FilterList(
         AdvSearchNote("Separate tags with commas (,)"),
         AdvSearchNote("Prepend with dash (-) to exclude"),
@@ -264,6 +301,11 @@ abstract class NHentai : KeiSource(), ConfigurableSource {
         UploadedFilter(),
         AdvSearchNote("Filter by pages, for example: (>20)"),
         PagesFilter(),
+        Filter.Separator(),
+        AdvSearchNote("Choose a preset to combine filters, or enter a name, enable saving, and search."),
+        LoadPresetFilter(getFilterPresets().map { it.name }),
+        SavePresetNameFilter(),
+        SavePresetFilter(),
         Filter.Separator(),
         SortFilter(),
         OffsetPageFilter(),
@@ -291,6 +333,7 @@ abstract class NHentai : KeiSource(), ConfigurableSource {
     private companion object {
         const val PREFIX_ID_SEARCH = "id:"
         const val TITLE_PREF = "Display manga title as:"
+        const val FILTER_PRESETS_PREF = "filter_presets"
         const val GALLERY_SELECTOR = "#content .container:not(.index-popular) .gallery"
         const val NEXT_PAGE_SELECTOR = "#content > section.pagination > a.next"
         const val HENTAI_SELECTOR = "script:containsData(JSON.parse):not(:containsData(media_server)):not(:containsData(avatar_url))"

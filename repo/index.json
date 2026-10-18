@@ -3,8 +3,7 @@
   "badgeLabel": "NH",
   "signingKey": "7e3259bec9703515339adb671a2dc7c812df3594a7b680f98878460e9e035957",
   "contact": {
-    "website": "https://github.com/MorpKnight/trust-me-bro",
-    "discord": null
+    "website": "https://github.com/MorpKnight/trust-me-bro"
   },
   "extensionList": {
     "extensions": [
@@ -12,13 +11,13 @@
         "name": "NHentai",
         "packageName": "eu.kanade.tachiyomi.extension.all.nhentai",
         "resources": {
-          "apkUrl": "https://pub-4516beba67d347eeabaa848f3f129375.r2.dev/apk/tachiyomi-all.nhentai-v1.6.56.apk",
+          "apkUrl": "https://pub-4516beba67d347eeabaa848f3f129375.r2.dev/apk/tachiyomi-all.nhentai-v1.6.57.apk",
           "iconUrl": "https://raw.githubusercontent.com/MorpKnight/trust-me-bro/main/repo/icon.png",
-          "jarUrl": "https://pub-4516beba67d347eeabaa848f3f129375.r2.dev/jar/tachiyomi-all.nhentai-v1.6.56.jar"
+          "jarUrl": "https://pub-4516beba67d347eeabaa848f3f129375.r2.dev/jar/tachiyomi-all.nhentai-v1.6.57.jar"
         },
         "extensionLib": "1.6",
-        "versionCode": 106056,
-        "versionName": "1.6.56",
+        "versionCode": "106057",
+        "versionName": "1.6.57",
         "contentWarning": "CONTENT_WARNING_NSFW",
         "sources": [
           {

@@ -13,8 +13,8 @@ This module declares the `en` and `all` sources together. The hosted repo includ
 - Mihon 0.20+: <https://pub-4516beba67d347eeabaa848f3f129375.r2.dev/repo.json>
 - Tachimanga: <https://raw.githubusercontent.com/MorpKnight/trust-me-bro/main/repo/index.pb>
 - Legacy-compatible clients: <https://raw.githubusercontent.com/MorpKnight/trust-me-bro/main/repo/index.min.json>
-- APK: <https://pub-4516beba67d347eeabaa848f3f129375.r2.dev/apk/tachiyomi-all.nhentai-v1.6.56.apk>
-- Tachimanga JAR: <https://pub-4516beba67d347eeabaa848f3f129375.r2.dev/jar/tachiyomi-all.nhentai-v1.6.56.jar>
+- APK: <https://pub-4516beba67d347eeabaa848f3f129375.r2.dev/apk/tachiyomi-all.nhentai-v1.6.57.apk>
+- Tachimanga JAR: <https://pub-4516beba67d347eeabaa848f3f129375.r2.dev/jar/tachiyomi-all.nhentai-v1.6.57.jar>
 
 The v2 repository index pins the APK signing certificate fingerprint. This initial APK uses the local Android debug signing key; future releases must keep using that same key to update an existing installation. The key is stored on this computer, outside this project, so keep it available or set up a dedicated release key before moving builds to another machine.
 
