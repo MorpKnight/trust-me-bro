@@ -222,10 +222,32 @@ abstract class NHentai :
     }
 
     private fun Document.getHentaiData(): Hentai {
-        val script = selectFirst(HENTAI_SELECTOR)?.data()
-            ?: throw Exception("Gallery data was not found")
-        val data = DATA_REGEX.find(script)?.groupValues?.get(1)
-            ?: throw Exception("Gallery data could not be parsed")
+        // Try primary selector: script containing JSON.parse
+        var script = selectFirst(HENTAI_SELECTOR)?.data()
+
+        // Fallback 1: Any script tag with JSON.parse
+        if (script == null) {
+            script = selectFirst("script:contains(JSON.parse)")?.data()
+        }
+
+        // Fallback 2: Script tag containing media_id
+        if (script == null) {
+            script = selectFirst("script:contains(media_id)")?.data()
+        }
+
+        if (script == null) throw Exception("Gallery data was not found")
+
+        // Try primary regex: JSON.parse("...")
+        var data = DATA_REGEX.find(script)?.groupValues?.get(1)
+
+        // Fallback regex: match raw JSON object with media_id
+        if (data == null) {
+            val fallbackRegex = Regex("""\{[^}]*"media_id"\s*:\s*\d+\}[^}]*\}")
+            val fallbackMatch = fallbackRegex.find(script)
+            data = fallbackMatch?.groupValues?.get(0)
+        }
+
+        if (data == null) throw Exception("Gallery data could not be parsed")
         return data.parseSourceData()
     }
 
@@ -336,8 +358,12 @@ abstract class NHentai :
         const val FILTER_PRESETS_PREF = "filter_presets"
         const val GALLERY_SELECTOR = "#content .container:not(.index-popular) .gallery"
         const val NEXT_PAGE_SELECTOR = "#content > section.pagination > a.next"
-        const val HENTAI_SELECTOR = "script:containsData(JSON.parse):not(:containsData(media_server)):not(:containsData(avatar_url))"
+        const val HENTAI_SELECTOR = "script:contains(JSON.parse)"
+        // Primary regex: JSON.parse("...")
+// Falls back to raw JSON object matching if primary fails
         val DATA_REGEX = Regex("""JSON\.parse\(\s*"(.*)"\s*\)""")
+        // Fallback regex for raw JSON containing media_id
+        val FALLBACK_REGEX = Regex("""\{[^}]*"media_id"\s*:\s*\d+\}[^}]*\}")
         val THUMB_CDN_REGEX = Regex("""thumb_cdn_urls:\s*(\[.*])""")
         val IMAGE_CDN_REGEX = Regex("""image_cdn_urls:\s*(\[.*])""")
         val UNICODE_ESCAPE_REGEX = Regex("""\\u([0-9A-Fa-f]{4})""")
